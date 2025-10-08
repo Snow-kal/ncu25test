@@ -1,0 +1,16 @@
+# 基础科学计算库
+numpy>=1.21.0
+matplotlib>=3.5.0
+
+# 可选优化库（学生可根据需要安装）
+# numba>=0.56.0
+# scipy>=1.7.0
+# pandas>=1.3.0
+# seaborn>=0.11.0
+# joblib>=1.1.0
+# cython>=0.29.0
+
+# 性能分析工具（可选）
+# line-profiler>=3.3.0
+# memory-profiler>=0.60.0
+# psutil>=5.8.0
