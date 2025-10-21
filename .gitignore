@@ -175,7 +175,7 @@ $RECYCLE.BIN/
 # Results and output files
 results/
 output/
-*.png
+
 *.jpg
 *.jpeg
 *.pdf
