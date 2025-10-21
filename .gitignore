@@ -178,7 +178,7 @@ output/
 
 *.jpg
 *.jpeg
-*.pdf
+
 *.svg
 
 # Data files
