@@ -42,25 +42,22 @@
      #生成粒子的坐标
      x = [random.randint(0,L-1) for _ in range(N)]
      y = [random.randint(0,L-1) for _ in range(N)]
-
      moveDirections = [(0,1),(0,-1),(1,0),(-1,0)]
 
 给所有的粒子生成初始坐标,生成粒子方向
 
     for _ in range(T):
-        for i in range(N):
-            dx, dy = random.choice(moveDirections)
-            x[i] += dx
-            y[i] += dy
-            #周期性边界条件（即从右边界走出 = 从左边界进入）
-            x[i] %= L
-            y[i] %= L
-        totalCenterTCount = 0
-        for i in range(N):
-            #判断粒子是否在中心区域
-            if (centerMin <= x[i] < centerMax) and (centerMin <= y[i] < centerMax):
-            totalCenterTCount += 1
-            totalCenterT += totalCenterTCount
+    for i in range(N):
+    dx, dy = random.choice(moveDirections)
+    x[i] += dx
+    y[i] += dy #周期性边界条件（即从右边界走出 = 从左边界进入）
+    x[i] %= L
+    y[i] %= L
+    totalCenterTCount = 0
+    for i in range(N): #判断粒子是否在中心区域
+    if (centerMin <= x[i] < centerMax) and (centerMin <= y[i] < centerMax):
+    totalCenterTCount += 1
+    totalCenterT += totalCenterTCount
 
 对于每一步 T，历遍所有的粒子 N，并给它随机一个方向。统计每一步 T 所有在中心区域的粒子，之后统计所有在中心区域的粒子
 
@@ -68,28 +65,26 @@
 
 #### 核心代码:
 
-    #生成粒子的坐标
+     #生成粒子的坐标
     x = np.random.randint(0, L, N,dtype=np.int64)
     y = np.random.randint(0, L, N,dtype=np.int64)
 
 一次生成 N 个整数的粒子坐标
 
-    moveDirections = np.array([[0, 1], [0, -1], [1, 0], [-1, 0]], dtype=np.int64)
+     moveDirections = np.array([[0, 1], [0, -1], [1, 0], [-1, 0]], dtype=np.int64)
 
 给出粒子移动方向的向量
 
     for t in range(T):
-        selectDirections = np.random.randint(0,4,N,dtype=np.int64)
-        dx,dy = moveDirections[selectDirections].T
-        x += dx
-        y += dy
-        #周期性边界条件（即从右边界走出 = 从左边界进入）
-        x = x  % L
-        y = y  % L
-        #判断粒子是否在中心区域
-        centerT = (x >= centerMin) & (x < centerMax) & (y >= centerMin) & (y < centerMax)
-        totalCenterT += sum(centerT)
-        totalT = N * TdwellRatiox = totalCenterT/totalT
+    selectDirections = np.random.randint(0,4,N,dtype=np.int64)
+    dx,dy = moveDirections[selectDirections].T
+    x += dx
+    y += dy #周期性边界条件（即从右边界走出 = 从左边界进入）
+    x = x % L
+    y = y % L #判断粒子是否在中心区域
+    centerT = (x >= centerMin) & (x < centerMax) & (y >= centerMin) & (y < centerMax)
+    totalCenterT += sum(centerT)
+    totalT = N * T; TdwellRatiox = totalCenterT/totalT
 
 给所有的 N 粒子，进行随机移动方向的赋予，并计算每一步时所有在中心区域的粒子，进行 T 遍
 
@@ -99,17 +94,17 @@
 
 #### 1. 引入库的对比
 
-    numpy 的向量化运算和底层的 C 语言的实现的数据批量化操做让其相比于 Python 原有的数据循环的有了质的飞跃
+     numpy 的向量化运算和底层的 C 语言的实现的数据批量化操做让其相比于 Python 原有的数据循环的有了质的飞跃
 
 #### 2. 功能模块分析：
 
-    随机数生成：[python]random.randint   [numpy]np.random.randint   numpy的生成基于高效算法，速度更快
-    求和计算：[python]for循环累加计数	[numpy]sum(centerT)（C 实现的求和函数）    Numpy 的sum函数避免了 Python 循环的
+     随机数生成：[python]random.randint [numpy]np.random.randint numpy 的生成基于高效算法，速度更快
+     求和计算：[python]for 循环累加计数 [numpy]sum(centerT)（C 实现的求和函数） Numpy 的 sum 函数避免了 Python 循环的
 
 ### 可视化的引入:
 
     resultMap,_,_ = np.histogram2d(x,y,bins=L,range=[[0,L],[0,L]])
-    # result
+    #result
     plt.figure(figsize=(10,10))
     plt.imshow(resultMap,cmap='viridis')
     plt.xlabel('x')
@@ -120,35 +115,35 @@
 
 ### 可视化优化：
 
-    plt.imshow(resultMap, cmap='viridis', extent=[0, L, 0, L], origin='lower')  # 使y轴从下到上递增显示更合理
+    plt.imshow(resultMap, cmap='viridis', extent=[0, L, 0, L], origin='lower') # 使 y 轴从下到上递增显示更合理
     plt.colorbar(label='Reference') #增加颜色条 使显示更直观
 
 这样使生成的分布图更加直观,能够体现出每个网格的粒子密度
 
-### 计算优化 V1;
+### 计算优化:
 
 #### 内存节省：
+
+    x = np.random.randint(0, L, N,dtype=np.int64)
+    y = np.random.randint(0, L, N,dtype=np.int64)
+
+将原有的 int64 改成 int32 减少了不必的内存占用
 
     x = np.random.randint(0, L, N,dtype=np.int32)
     y = np.random.randint(0, L, N,dtype=np.int32)
 
-将原有的 int64 改成 int32 减少了不必的内存占用
-
-    selectDirections = np.random.randint(0,4,N,dtype=np.int64)
-    dx,dy = moveDirections[selectDirections].T
-
 #### 方向生成加速：
 
-    selectDirections = np.random.randint(0,4,N); dx, dy = moveDirections[selectDirections].T
+     selectDirections = np.random.randint(0,4,N); dx, dy = moveDirections[selectDirections].T
 
 将原有的重复性多直接花式索引改为 np.take 更该之后有着更快的响应速度
 
-    dx, dy = np.take(moveDirections, np.random.randint(0,4,N), axis=0).T
+     dx, dy = np.take(moveDirections, np.random.randint(0,4,N), axis=0).T
 
 #### 减少求和的计算占用：
 
-    centerT = (x >= centerMin) & (x < centerMax) & (y >= centerMin) & (y < centerMax)
-    totalCenterT += sum(centerT)
+     centerT = (x >= centerMin) & (x < centerMax) & (y >= centerMin) & (y < centerMax)
+     totalCenterT += sum(centerT)
 
 原有问题：先是创建了一个临时的布尔来判定是否位于中心区域之后再次进行计算，这会带来非必要的计算开销。在如下更改后直接计算，不创建临时的布尔数组来判定，减少了内存占用
 
